@@ -17,6 +17,12 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+#Generated Files
+*.asv
+*.mat
+*.fig
+*.kml
+
 # =========================
 # Operating System Files
 # =========================

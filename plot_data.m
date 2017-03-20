@@ -1,25 +1,6 @@
 close all; clear all; clc;
 S = csvread_all();
 tot = sum(~cellfun('isempty',{S.name}));
-for i = 1:tot
-   S(i).name = strrep(S(i).name, '_slash_', ':');
-   S(i).name = strrep(S(i).name, '_', ' ');
-   S(i).name = strrep(S(i).name, '.csv', '');
-%    T = S(i).table;
-%    figure();
-%    title(S(i).name);
-%    hold on
-%    leg = [];
-%    for k = 2:width(T)
-%        try
-%            plot(T.(1),T.(k))
-%            leg = [leg, T.Properties.VariableNames(k)];
-%        catch
-%            continue
-%        end
-%    end
-%    legend(leg)
-end
 S(1).zerotime = S(1).table.(1)(1);
 save 'data.mat' 'S'
 clear all;
