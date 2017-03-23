@@ -3,6 +3,7 @@ function [ data ] = finddata( S, name )
 %   Returns empty if name not found
 %   S is struct with fields name and table.
     found = false;
+    zerotime = S(1).table.(1)(1);
     for i = 1:sum(~cellfun('isempty',{S.name}));
         if(strcmp(S(i).name,name))
            found = true;
@@ -12,7 +13,7 @@ function [ data ] = finddata( S, name )
     data = struct();
     if(found)
         data = S(i).table;
-        data.(1) = (data.(1) - S(1).zerotime)/1000000000;
+        data.(1) = (data.(1) - zerotime)/1000000000;
     end
 
 end

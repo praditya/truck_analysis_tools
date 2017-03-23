@@ -22,6 +22,7 @@ $RECYCLE.BIN/
 *.mat
 *.fig
 *.kml
+*.png
 
 # =========================
 # Operating System Files
