@@ -10,22 +10,44 @@ if(~exist(strcat(folder_name,'\data.mat')))
     folder_name = strcat(folder_name,'\');
 else
     load(strcat(folder_name,'\data.mat'))
-    return
+%     return
 end
 
-%% GPS Data
-rate = 5; %hz 
-gps = novatel_gps(S,rate);
-clear rate;
-if(isempty(fieldnames(gps)))
-    clear gps
+%% zed_odom
+data = finddata(S,':zed:odom');
+if(~isempty(fieldnames(data)))
+    zed_odom = timeseries([data.(12) data.(13) data.(14)],data.(1),'Name','Zed Odometry');
 end
+clear data;
+%% corrimudata
+data = finddata(S,':novatel data:corrimudata');
+if(~isempty(fieldnames(data)))
+    corrimudata = timeseries([data.(20) data.(21) data.(22)],data.(1),'Name','Acceleration');
+end
+clear data;
+%% Novatel INSPVAX
+gps = novatel_gps(S);
+% if(isempty(fieldnames(gps)))
+%     clear gps
+% end
+
+%%
+% %% GPS Data
+% rate = 5; %hz 
+% gps = novatel_gps(S,rate);
+% clear rate;
+% if(isempty(fieldnames(gps)))
+%     clear gps
+% end
 %% mavros GPS Speed
 data = finddata(S,':mavros:local position:velocity');
 if(~isempty(fieldnames(data)))
     mavros_spd = timeseries(sqrt(data.(10).^2 + data.(11).^2),data.(1),'Name', 'Mavros Speed (m/s)');
 end
 clear data;
+%% mavros GPS Position
+% gps = mavros_gps(S);
+% clear data;
 %% vehicle speed report
 data = finddata(S,':pacmod:parsed tx:vehicle speed rpt');
 if(~isempty(fieldnames(data)))
@@ -69,6 +91,6 @@ if(~isempty(fieldnames(data)))
 end
 clear data;
 %% end
-clear S;
+% clear S;
 save(strcat(folder_name,'data.mat'));
-plot_data
+% plot_data
