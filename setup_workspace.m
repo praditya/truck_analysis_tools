@@ -1,16 +1,16 @@
 close all; clear all; clc;
 %% read from folder
 try
-    folder_name = uigetdir('..\Rosbag');
+    folder_name = uigetdir('../../Rosbag');
 catch
     return
 end
-if(~exist(strcat(folder_name,'\data.mat')))
+if(~exist(strcat(folder_name,'/data.mat')))
     S = csvread_all(folder_name);
-    folder_name = strcat(folder_name,'\');
+    folder_name = strcat(folder_name,'/');
 else
-    load(strcat(folder_name,'\data.mat'))
-    return
+    load(strcat(folder_name,'/data.mat'))
+%     return
 end
 
 %% GPS Data
@@ -21,54 +21,54 @@ if(isempty(fieldnames(gps)))
     clear gps
 end
 %% mavros GPS Speed
-data = finddata(S,':mavros:local position:velocity');
+data = finddata(S,'_mavros_local_position_velocity');
 if(~isempty(fieldnames(data)))
     mavros_spd = timeseries(sqrt(data.(10).^2 + data.(11).^2),data.(1),'Name', 'Mavros Speed (m/s)');
 end
 clear data;
 %% vehicle speed report
-data = finddata(S,':pacmod:parsed tx:vehicle speed rpt');
+data = finddata(S,'_pacmod_parsed_tx_vehicle_speed_rpt');
 if(~isempty(fieldnames(data)))
     pacmod_spd = timeseries(data.(2)*0.18,data.(1),'Name','Pacmod Speed (m/s)');
 end
 clear data;
 %% accel_rpt
-data = finddata(S,':pacmod:parsed tx:accel rpt');
+data = finddata(S,'_pacmod_parsed_tx_accel_rpt');
 if(~isempty(fieldnames(data)))
     accel_rpt = timeseries(data.(10),data.(1),'Name','Accelerator Report (%)');
 end
 clear data;
 %% steer_rpt
-data = finddata(S,':pacmod:parsed tx:steer rpt');
+data = finddata(S,'_pacmod_parsed_tx_steer_rpt');
 if(~isempty(fieldnames(data)))
     steer_rpt = timeseries(data.(9),data.(1),'Name','Steering Angle (rad)');
 end
 clear data;
 %% cmd_vel
-data = finddata(S,':cmd vel with limits');
+data = finddata(S,'_cmd_vel_with_limits');
 if(~isempty(fieldnames(data)))
     cmd_vel = timeseries(data.(4),data.(1),'Name','Command Speed (m/s)');
 end
 clear data;
 %% accel_cmd
-data = finddata(S,':pacmod:as rx:accel cmd');
+data = finddata(S,'_pacmod_as_rx_accel_cmd');
 if(~isempty(fieldnames(data)))
     accel_cmd = timeseries(data.(2),data.(1),'Name','Accelerator Command (%)');
 end
 clear data;
 %% req_accel
-data = finddata(S,':req accel');
+data = finddata(S,'_req_accel');
 if(~isempty(fieldnames(data)))
     req_accel = timeseries(data.(2),data.(1),'Name','Required Acceleration (m/s^2)');
 end
 clear data;
 %% filtered accel
-data = finddata(S,':filtered accel');
+data = finddata(S,'_filtered_accel');
 if(~isempty(fieldnames(data)))
     filtered_accel = timeseries(data.(2),data.(1),'Name','Filtered Acceleration (m/s^2)');
 end
 clear data;
 %% end
-clear S;
+% clear S;
 save(strcat(folder_name,'data.mat'));
 plot_data
