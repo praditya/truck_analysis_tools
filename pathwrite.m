@@ -64,6 +64,6 @@ fprintf(fileID,'\n\t\t\t</LineString>');
 fprintf(fileID,'\n\t\t</Placemark>');
 fprintf(fileID,'\n\t</Document>');
 fprintf(fileID,'\n</kml>');
-
+fclose(fileID)
 end
 
