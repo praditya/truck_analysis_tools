@@ -10,7 +10,7 @@ function [s] = csvread_all(folder_name)
             s(i-skip).table = readtable(strcat(folder_name,'/',d(i).name));
             s(i-skip).name = d(i).name;
 %             s(i-skip).name = strrep(s(i-skip).name, '_slash_', ':');
-            s(i-skip).name = strrep(s(i-skip).name, '_', ':');
+%             s(i-skip).name = strrep(s(i-skip).name, '_', ':');
             s(i-skip).name = strrep(s(i-skip).name, '.csv', '');
             fprintf('read %s\n',d(i).name);
         catch

@@ -4,6 +4,12 @@ try
 novatel_plots
 hold off
 end
+%%plot wpts (if loaded)
+try
+    hold on
+    plot(wpts.N,wpts.E)
+    daspect([1 1 1])
+end
 %% throttle_plot
 try
 plot(accel_cmd,'.-')
@@ -83,6 +89,7 @@ end
 %% delay
 % delay
 %% corrimudata
+try
 time = corrimudata.time;
 rate = [0;1./diff(time)];
 hold on
@@ -91,7 +98,32 @@ xfilt = filter(.02/.25, [1 .02/.25-1], corrimudata.data(:,2).*50);
 % plot(xfilt)
 plot(corrimudata.time,xfilt)
 min(xfilt)
-
+end
+%% curvature analysis
+try
+  figure()
+    hold on
+    plot(cmd_vel.time,cmd_vel.data(:,1))
+    plot(gps.time,gps.speed)
+    figure()
+    hold on
+    plot(imu_data.time(:,1),-imu_data.data(:,3))
+    plot(cmd_vel.time,cmd_vel.data(:,2))
+    r = cmd_vel.data(:,1)./cmd_vel.data(:,2);
+    [ts1, ts2] = synchronize(timeseries(gps.speed,gps.time),imu_data,'Uniform','Interval',0.05);
+    rad = ts1.data./ts2.data(:,3);
+    %%
+    figure()     
+    hold on
+    plot(cmd_vel.time,r)
+    plot(ts1.time, -rad)
+    wb = 2.565;
+    SR = 24;
+    radius = wb./tan(steer_rpt.data(:,1)./SR);
+    plot(steer_rpt.time,radius)
+    ylim([-20 20])
+    xlim([0 steer_rpt.time(end)])
+end
 %% end 
 close(f)
 clear f
