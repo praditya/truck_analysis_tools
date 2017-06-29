@@ -85,8 +85,14 @@ if(~isempty(fieldnames(data)))
     end
 end
 clear data;
-%% cmd_vel
+%% cmd_vel_with_limits
 data = finddata(S,'_cmd_vel_with_limits');
+if(~isempty(fieldnames(data)))
+    cmd_vel = timeseries([data.(2) data.(7)],data.(1),'Name','Command Speed (m/s)');
+end
+clear data;
+%% cmd_vel
+data = finddata(S,'_cmd_vel');
 if(~isempty(fieldnames(data)))
     cmd_vel = timeseries([data.(2) data.(7)],data.(1),'Name','Command Speed (m/s)');
 end

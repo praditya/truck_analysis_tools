@@ -9,6 +9,11 @@ try
     hold on
     plot(wpts.N,wpts.E)
     daspect([1 1 1])
+    ylabel 'N'
+    xlabel 'E'
+    legend  'Logged path' 'Prerecorded Path'
+    print('-djpeg', strcat(folder_name,'path_plot.jpg'))
+    hold off
 end
 %% throttle_plot
 try
@@ -60,10 +65,9 @@ end
 
 %% speed analysis
 try
-plot(mavros_spd)
+plot(gps.time,gps.speed)
 hold on
-plot(cmd_vel)
-[mavros_spd cmd_vel] = synchronize(mavros_spd, cmd_vel,'union','KeepOriginalTimes',true);
+plot(cmd_vel.time, cmd_vel.data(:,1))
 % plot((cmd_vel-mavros_spd))
 legend('GPS speed','Command Speed')
 xlabel 'Time(s)'
@@ -92,28 +96,34 @@ end
 try
 time = corrimudata.time;
 rate = [0;1./diff(time)];
-hold on
 plot(corrimudata.time,corrimudata.data(:,2).*50)
+hold on
 xfilt = filter(.02/.25, [1 .02/.25-1], corrimudata.data(:,2).*50);
 % plot(xfilt)
 plot(corrimudata.time,xfilt)
-min(xfilt)
+min(xfilt);
+    ylabel 'Acceleration (m/s^2)'
+    xlabel 'Time (s)'
+    legend  'Imu Raw' 'Filtered Acceleration'
+hold off
+% print('-djpeg', strcat(folder_name,'filter_test.jpg'))
 end
 %% curvature analysis
 try
-  figure()
-    hold on
-    plot(cmd_vel.time,cmd_vel.data(:,1))
-    plot(gps.time,gps.speed)
-    figure()
+%     figure()
     hold on
     plot(imu_data.time(:,1),-imu_data.data(:,3))
     plot(cmd_vel.time,cmd_vel.data(:,2))
     r = cmd_vel.data(:,1)./cmd_vel.data(:,2);
     [ts1, ts2] = synchronize(timeseries(gps.speed,gps.time),imu_data,'Uniform','Interval',0.05);
     rad = ts1.data./ts2.data(:,3);
+    ylabel 'Angular Rate (rad/s)'
+    xlabel 'Time (s)'
+    legend  'IMU Data' 'Command Data'
+    hold off
+%     print('-djpeg', strcat(folder_name,'Angular_analyis.jpg'))
     %%
-    figure()     
+%     figure()     
     hold on
     plot(cmd_vel.time,r)
     plot(ts1.time, -rad)
@@ -123,6 +133,11 @@ try
     plot(steer_rpt.time,radius)
     ylim([-20 20])
     xlim([0 steer_rpt.time(end)])
+    ylabel 'Radius of Curvature (m)'
+    xlabel 'Time (s)'
+    legend  'Command Data' 'GPS data' 'Pacmod Steering Data'
+    hold off
+    print('-djpeg', strcat(folder_name,'radius_compare.jpg'))
 end
 %% end 
 close(f)

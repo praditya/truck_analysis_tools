@@ -1,5 +1,5 @@
 %%plot GPS data
-figure()
+% figure()
 plot(gps.N,gps.E)
 daspect([1 1 1])
 % figure()
