@@ -41,10 +41,10 @@ function [ ] = kmlcreate( name,lat,long,alt )
 %     </Placemark>
 %   </Document>
 % </kml>
-lat
-long
-alt
-fileID = fopen(name,'wt')
+lat;
+long;
+alt;
+fileID = fopen(name,'wt');
 fprintf(fileID,'<?xml version="1.0" encoding="UTF-8"?>');
 fprintf(fileID,'\n<kml xmlns="http://www.opengis.net/kml/2.2">');
 fprintf(fileID,'\n\t<Document>');
@@ -67,8 +67,8 @@ fprintf(fileID,'\n\t\t\t\t<tessellate>1</tessellate>');
 fprintf(fileID,'\n\t\t\t\t<altitudeMode>absolute</altitudeMode>');
 fprintf(fileID,'\n\t\t\t\t<coordinates>');
 
-fspec = '\n\t\t\t\t\t%f,%f,%f'
-nums = [lat'; long'; zeros(length(lat),1)';]
+fspec = '\n\t\t\t\t\t%f,%f,%f';
+nums = [long'; lat'; zeros(length(lat),1)';];
 fprintf(fileID,fspec,nums);
 
 fprintf(fileID,'\n\t\t\t\t</coordinates>');

@@ -1,6 +1,10 @@
 %%plot GPS data
 % figure()
-plot(gps.N,gps.E)
+if exist('wpts')
+    plot(gps.N - wpts.N(1),gps.E - wpts.E(1))
+else
+    plot(gps.N,gps.E)
+end
 daspect([1 1 1])
 % figure()
 % quiver(gps.N,gps.E,gps.Nspeed,gps.Espeed)

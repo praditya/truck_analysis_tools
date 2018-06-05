@@ -4,16 +4,27 @@ try
 novatel_plots
 hold off
 end
-%%plot wpts (if loaded)
+%% plot wpts (if loaded)
 try
     hold on
-    plot(wpts.N,wpts.E)
+    plot(wpts.N - wpts.N(1),wpts.E - wpts.E(1),'.')
     daspect([1 1 1])
-    ylabel 'N'
-    xlabel 'E'
-    legend  'Logged path' 'Prerecorded Path'
-    print('-djpeg', strcat(folder_name,'path_plot.jpg'))
+    ylabel 'N (m)'
+    xlabel 'E (m)'
+    legend  'Logged Path' 'Waypoint Path'
+    print('-depsd', strcat(folder_name,'path_plot.eps'))
     hold off
+end
+%% veh_speed analysis
+plot(pacmod_spd)
+hold on
+plot(pacmod_enable)
+plot(brake_rpt);
+hold off
+%% slope calcs
+try
+   X = [ones(length(slope),1) slope(:,1)];
+   slp = X\slope(:,2)
 end
 %% throttle_plot
 try
@@ -60,7 +71,7 @@ ylabel 'Acceleration (m/s^2)'
 title ''
 hold off
 
-print('-djpeg', strcat(folder_name,'accel_analysis.jpg'))
+print('-depsc', strcat(folder_name,'accel_analysis.eps'))
 end
 
 %% speed analysis
@@ -72,10 +83,12 @@ plot(cmd_vel.time, cmd_vel.data(:,1))
 legend('GPS speed','Command Speed')
 xlabel 'Time(s)'
 ylabel 'Speed (m/s)'
+% xlim([0 12])
+ylim([0 10])
 title ''
 hold off
 
-print('-djpeg', strcat(folder_name,'speed_analysis.jpg'))
+print('-depsc', strcat(folder_name,'speed_analysis.eps'))
 end
 %% pacmod throttle response analysis
 % try
@@ -96,23 +109,39 @@ end
 try
 time = corrimudata.time;
 rate = [0;1./diff(time)];
-plot(corrimudata.time,corrimudata.data(:,2).*50)
+% plot(corrimudata.time,corrimudata.data(:,2).*50)
+Fs = 50;
+% x = sqrt(corrimudata.data(:,1).^2*50+corrimudata.data(:,2).^2*50+corrimudata.data(:,3).^2*50);
+x = corrimudata.data(1:500,1)*50;
+N = length(x);
+xdft = fft(x);
+xdft = xdft(1:N/2+1);
+psdx = (1/(Fs*N)) * abs(xdft).^2;
+psdx(2:end-1) = 2*psdx(2:end-1);
+freq = 0:Fs/length(x):Fs/2;
+
+plot(freq,10*log10(psdx))
+grid on
+title('Periodogram Using FFT')
+xlabel('Frequency (Hz)')
+ylabel('Power/Frequency (dB/Hz)')
+% figure
 hold on
 xfilt = filter(.02/.25, [1 .02/.25-1], corrimudata.data(:,2).*50);
 % plot(xfilt)
-plot(corrimudata.time,xfilt)
+% plot(corrimudata.time,xfilt)
 min(xfilt);
-    ylabel 'Acceleration (m/s^2)'
-    xlabel 'Time (s)'
-    legend  'Imu Raw' 'Filtered Acceleration'
+%     ylabel 'Acceleration (m/s^2)'
+%     xlabel 'Time (s)'
+%     legend  'Imu Raw' 'Filtered Acceleration'
 hold off
 % print('-djpeg', strcat(folder_name,'filter_test.jpg'))
 end
 %% curvature analysis
 try
 %     figure()
+    plot(imu_data.time(:,1),imu_data.data(:,3))
     hold on
-    plot(imu_data.time(:,1),-imu_data.data(:,3))
     plot(cmd_vel.time,cmd_vel.data(:,2))
     r = cmd_vel.data(:,1)./cmd_vel.data(:,2);
     [ts1, ts2] = synchronize(timeseries(gps.speed,gps.time),imu_data,'Uniform','Interval',0.05);
@@ -121,24 +150,31 @@ try
     xlabel 'Time (s)'
     legend  'IMU Data' 'Command Data'
     hold off
-%     print('-djpeg', strcat(folder_name,'Angular_analyis.jpg'))
+    print('-djpeg', strcat(folder_name,'Angular_analyis.jpg'))
     %%
-%     figure()     
+%     figure()
+    plot(ts1.time, -1./rad)
     hold on
-    plot(cmd_vel.time,r)
-    plot(ts1.time, -rad)
+    plot(cmd_vel.time,1./r)    
     wb = 2.565;
     SR = 24;
     radius = wb./tan(steer_rpt.data(:,1)./SR);
-    plot(steer_rpt.time,radius)
-    ylim([-20 20])
+    %plot(steer_rpt.time,radius)
+%     ylim([-20 20])
     xlim([0 steer_rpt.time(end)])
-    ylabel 'Radius of Curvature (m)'
+    ylabel 'Curvature (m^-^1)'
     xlabel 'Time (s)'
-    legend  'Command Data' 'GPS data' 'Pacmod Steering Data'
+    legend  'IMU Data' 'Command Data' %'Pacmod Steering Data'
     hold off
     print('-djpeg', strcat(folder_name,'radius_compare.jpg'))
 end
-%% end 
+%% create KML of path
+try
+   kmlcreate(strcat(folder_name,'/Path.kml'),gps.lat,gps.long,gps.alt);
+catch
+    disp 'kmlcreate failed'
+end
+   disp('done');
+%% end
 close(f)
 clear f

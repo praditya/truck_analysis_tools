@@ -1,22 +1,23 @@
-if(exist(strcat(folder_name,'/path_data.mat')) && issim~= true )
+if(exist(strcat(folder_name,'/path_data.mat')) && issim~= true)
     load(strcat(folder_name,'/path_data.mat'))
-%     plot3(gps.N,gps.E,crosstrack_error)
+    plot3(gps.N,gps.E,crosstrack_error)
 else
     if(exist('selection','var'))
         for j = 1:length(selection)
             % do the same thing but only over the selected bit of path
         end
     else
+        tic
         crosstrack_error = zeros(1, length(gps.N));
         for j = 1:length(gps.N)
             C = struct('x',gps.N(j), 'y', gps.E(j));
             cerr = zeros(1, length(wpts.N));
             for k = 1:length(wpts.N)
                 A = struct('x',wpts.N(k), 'y', wpts.E(k));
-                if(dist(A,C) > 2 && k > 1 && k < length(wpts.N))
-                    cerr(k) = 2;
-                    continue;
-                end
+%                 if(dist(A,C) > 2 && k > 1 && k < length(wpts.N))
+%                     cerr(k) = 2;
+%                     continue;
+%                 end
                 if(k==length(wpts.N))
                     B = struct('x',wpts.N(1), 'y', wpts.E(1));
                 else
@@ -29,6 +30,13 @@ else
                 cerr(k) = dist(C,D);
             end
             crosstrack_error(j) = min(cerr);
+            if(mod(j,500)==1)
+                time = toc;
+                rem_time = (length(gps.N)-j)/j*time;
+                prc = time/(time+rem_time)*100;
+                
+                fprintf("%.0fs remaining (%.2f%s complete)\n",rem_time,j/length(gps.N)*100.0,'%');
+            end
         end
     end
     clear A B C D ab ac ad cerr j k;
@@ -37,7 +45,10 @@ else
     end
 end
 figure()
-plot(gps.time,crosstrack_error);
+distance = resample(pacmod_distance,gps.time);
+plot(distance.data,crosstrack_error);
+clear distance
 ylabel 'Error (m)'
-xlabel 'Time (s)'
-print('-djpeg', strcat(folder_name,'crosstrack_error.jpg'))
+xlabel 'Distance Traveled (m)'
+ylim([0 0.15])
+print('-depsc', strcat(folder_name,'crosstrack_error.eps'))

@@ -3,7 +3,7 @@ function [ data ] = finddata( S, name )
 %   Returns empty if name not found
 %   S is struct with fields name and table.
     found = false;
-    zerotime = S(1).table.(1)(1);
+    zerotime = S(2).table.(1)(1);
     for i = 1:sum(~cellfun('isempty',{S.name}));
         if(strcmp(S(i).name,name))
            found = true;

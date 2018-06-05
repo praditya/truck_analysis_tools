@@ -7,6 +7,9 @@ function [s] = csvread_all(folder_name)
     s(1).foldername = folder_name;
     for i = 1:length(d)
         try
+            if any(d(i).name == ["_joy.csv" "_diagnostics.csv" "_rosout.csv" "_rosout_agg.csv"])
+               error("useless topic"); 
+            end
             s(i-skip).table = readtable(strcat(folder_name,'/',d(i).name));
             s(i-skip).name = d(i).name;
 %             s(i-skip).name = strrep(s(i-skip).name, '_slash_', ':');
