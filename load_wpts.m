@@ -1,5 +1,5 @@
 try
-    temp_folder_name = uigetdir('../../Rosbag');
+    temp_folder_name = uigetdir('../../');
 catch
     return
 end

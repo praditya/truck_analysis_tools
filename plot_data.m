@@ -20,6 +20,7 @@ plot(pacmod_spd)
 hold on
 plot(pacmod_enable)
 plot(brake_rpt);
+%plot(cmd_brake);
 hold off
 %% slope calcs
 try

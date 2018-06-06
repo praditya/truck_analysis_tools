@@ -1,7 +1,7 @@
 close all; clear all; clc;
 %% read from folder
 try
-    folder_name = uigetdir('../../Rosbag');
+    folder_name = uigetdir('../../');
 catch
     return
 end
@@ -20,7 +20,7 @@ if(~isempty(fieldnames(data)))
 end
 clear data;
 %% corrimudata
-data = finddata(S,'_novatel_data_corrimudata');
+data = finddata(S,'_novatel_data_corrimudata'); %Not sure if needed anymore
 if(~isempty(fieldnames(data)))
     corrimudata = timeseries([data.(19) data.(20) data.(20)],data.(1),'Name','Acceleration');
 end
@@ -30,10 +30,8 @@ gps = novatel_gps(S);
 % if(isempty(fieldnames(gps)))
 %     clear gps
 % end
-%% vectornav
-gps = vectornav_gps(S);
 %% navsat Odom
-data = finddata(S,'_navsat_odom');
+data = finddata(S,'_navsat_odom'); % Not sure if needed anymore
 if(~isempty(fieldnames(data)))
     navsat_odom = timeseries([data.(6) data.(7) data.(8) data.(49) data.(50) data.(51)],data.(1),'Name','Navsat Odom');
 end
@@ -45,47 +43,33 @@ if(~isempty(fieldnames(data)))
     imu_data = timeseries([data.(14) data.(15) data.(16)],data.(1),'Name','Angular Speed (rad/s)');
 end
 clear data;
-%%
-% %% GPS Data
-% rate = 5; %hz 
-% gps = novatel_gps(S,rate);
-% clear rate;
-% if(isempty(fieldnames(gps)))
-%     clear gps
-% end
-%% mavros GPS Speed
-data = finddata(S,'_mavros_local_position_velocity');
-if(~isempty(fieldnames(data)))
-    mavros_spd = timeseries(sqrt(data.(10).^2 + data.(11).^2),data.(1),'Name', 'Mavros Speed (m/s)');
-end
-clear data;
-%% mavros GPS Position
-% gps = mavros_gps(S);
-% clear data;
+
 %% vehicle speed report
 data = finddata(S,'_pacmod_parsed_tx_vehicle_speed_rpt');
 if(~isempty(fieldnames(data)))
-    [times idx] = unique(data.(1),'stable');
-    dat = data.(8);
-    pacmod_spd = timeseries(dat(idx)*0.44704,times,'Name','Pacmod Speed (m/s)');
-%         pacmod_spd = timeseries(dat(idx),times,'Name','Pacmod Speed (m/s)');
-    temp = [];
-for k = 2:length(pacmod_spd.data(1:end))
-    temp(k) = trapz(pacmod_spd.time(1:k) - pacmod_spd.time(1),pacmod_spd.data(1:k));
-end
-    pacmod_distance = timeseries(temp',pacmod_spd.time,'Name', 'Pacmod Distance (m)');
-end
+%     [times idx] = unique(data.(1),'stable');
+%     dat = data.(8);
+%     pacmod_spd = timeseries(dat(idx)*0.44704,times,'Name','Pacmod Speed (m/s)'); % 0.44704 is conversion fro mph to m/s
+% %         pacmod_spd = timeseries(dat(idx),times,'Name','Pacmod Speed (m/s)');
+%     temp = [];
+
+    pacmod_spd = timeseries(data.(8),data.(1),'Name','Pacmod Speed (mph)');
+% for k = 2:length(pacmod_spd.data(1:end))
+%     temp(k) = trapz(pacmod_spd.time(1:k) - pacmod_spd.time(1),pacmod_spd.data(1:k));
+% end
+%     pacmod_distance = timeseries(temp',pacmod_spd.time,'Name', 'Pacmod Distance (m)');
+ end
 clear data temp dat idx k times;
-%% accel_rpt
-data = finddata(S,'_pacmod_parsed_tx_accel_rpt');
-if(~isempty(fieldnames(data)))
-    accel_rpt = timeseries(data.(10),data.(1),'Name','Accelerator Report (%)');
-end
-clear data;
+%% accel_rpt %not needed because pacmod doesn't output acceleration?
+% data = finddata(S,'_pacmod_parsed_tx_accel_rpt');
+% if(~isempty(fieldnames(data)))
+%     accel_rpt = timeseries(data.(10),data.(1),'Name','Accelerator Report (%)');
+% end
+% clear data;
 %% brake_rpt
-data = finddata(S,'_pacmod_parsed_tx_brake_rpt_detail_1');
+data = finddata(S,'_pacmod_parsed_tx_brake_rpt');
 if(~isempty(fieldnames(data)))
-    brake_rpt = timeseries((data.(9) - 9.228)/1.3720,data.(1),'Name','Brake Report (%)');
+     brake_rpt = timeseries(data.(17),data.(1), 'Name', 'Brake Report Output (%)'); %If negative value, no braking. Value between 0 & -1
 end
 clear data;
 %% enable
@@ -125,6 +109,12 @@ if(~isempty(fieldnames(data)))
 end
 
 clear data;
+%% cmd_brake
+data = finddata(S,'_pacmod_parsed_tx_brake_rpt');
+if(~isempty(fieldnames(data)))
+    cmd_brake = timeseries(data.(16),'Name','Brake Command (%)');
+end 
+clear data;
 %% accel_cmd
 data = finddata(S,'_pacmod_as_rx_accel_cmd');
 if(~isempty(fieldnames(data)))
@@ -143,16 +133,17 @@ if(~isempty(fieldnames(data)))
     filtered_accel = timeseries(data.(2),data.(1),'Name','Filtered Acceleration (m/s^2)');
 end
 clear data;
-%% VN300
-data = finddata(S,'_slash_vectornav_slash_gps');
-if(~isempty(fieldnames(data)))
-    vn300 = timeseries([data.(21) data.(22) data.(23)],data.(1),'Name','VN300 GPS');
-end
-clear data;
-
 %% end
 % clear S;
 issim = false;
 save(strcat(folder_name,'data.mat'));
-% plot_data
-%% VN300
+
+
+
+%Originally made by:
+
+%Garrison Neel @neelg1193
+
+%Modified by:
+
+%Amir Darwesh @amirx96
