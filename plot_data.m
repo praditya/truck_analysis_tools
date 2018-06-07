@@ -18,9 +18,13 @@ end
 %% veh_speed analysis
 plot(pacmod_spd)
 hold on
-plot(pacmod_enable)
+plot(pacmod_enable);
 plot(brake_rpt);
 %plot(cmd_brake);
+plot(accel_rpt);
+legend('Speed [mph]', 'Auto Enabled', 'Brake %', 'Throttle %');
+datetick('x','MM:SS')
+xlabel('MM:SS')
 hold off
 %% slope calcs
 try
@@ -29,14 +33,17 @@ try
 end
 %% throttle_plot
 try
-plot(accel_cmd,'.-')
+plot(accel_cmd,'b')
 hold on
-plot(accel_rpt,'.-')
+plot(accel_rpt,'r')
+
 xlabel 'Time(s)'
 ylabel 'Throttle'
 legend('Command', 'Pacmod Rpt')
 title ''
+datetick('x','MM:SS')
 hold off
+
 
 print('-djpeg', strcat(folder_name,'throttle_plot.jpg'))
 end

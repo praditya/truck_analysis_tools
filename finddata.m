@@ -13,7 +13,7 @@ function [ data ] = finddata( S, name )
     data = struct();
     if(found)
         data = S(i).table;
-        data.(1) = (data.(1) - zerotime)/1000000000;
+        %data.(1) = (data.(1) - zerotime)/1000000000;
     end
 
 end

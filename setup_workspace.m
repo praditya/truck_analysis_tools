@@ -1,7 +1,7 @@
 close all; clear all; clc;
 %% read from folder
 try
-    folder_name = uigetdir('../../');
+    folder_name = uigetdir('../../June 6th 2018');
 catch
     return
 end
@@ -53,23 +53,23 @@ if(~isempty(fieldnames(data)))
 % %         pacmod_spd = timeseries(dat(idx),times,'Name','Pacmod Speed (m/s)');
 %     temp = [];
 
-    pacmod_spd = timeseries(data.(8),data.(1),'Name','Pacmod Speed (mph)');
+    pacmod_spd = timeseries(data.(8),epoch2mat(data.(1)),'Name','Pacmod Speed (mph)');
 % for k = 2:length(pacmod_spd.data(1:end))
 %     temp(k) = trapz(pacmod_spd.time(1:k) - pacmod_spd.time(1),pacmod_spd.data(1:k));
 % end
 %     pacmod_distance = timeseries(temp',pacmod_spd.time,'Name', 'Pacmod Distance (m)');
  end
 clear data temp dat idx k times;
-%% accel_rpt %not needed because pacmod doesn't output acceleration?
-% data = finddata(S,'_pacmod_parsed_tx_accel_rpt');
-% if(~isempty(fieldnames(data)))
-%     accel_rpt = timeseries(data.(10),data.(1),'Name','Accelerator Report (%)');
-% end
-% clear data;
+%% accel_rpt 
+data = finddata(S,'_pacmod_parsed_tx_accel_rpt');
+if(~isempty(fieldnames(data)))
+    accel_rpt = timeseries(data.(17),epoch2mat(data.(1)),'Name','Accelerator Report (%)');
+end
+clear data;
 %% brake_rpt
 data = finddata(S,'_pacmod_parsed_tx_brake_rpt');
 if(~isempty(fieldnames(data)))
-     brake_rpt = timeseries(data.(17),data.(1), 'Name', 'Brake Report Output (%)'); %If negative value, no braking. Value between 0 & -1
+     brake_rpt = timeseries(data.(17),epoch2mat(data.(1)), 'Name', 'Brake Report Output (%)'); %If negative value, no braking. Value between 0 & -1
 end
 clear data;
 %% enable
@@ -79,7 +79,7 @@ if(~isempty(fieldnames(data)))
     for j = 1:length(data.(2))
         truefalse(j) = data.(2){j}=="True";
     end
-    pacmod_enable = timeseries(truefalse',data.(1),'Name','Enable');
+    pacmod_enable = timeseries(truefalse',epoch2mat(data.(1)),'Name','Enable');
 end
 clear data truefalse;
 %% steer_rpt
@@ -99,26 +99,26 @@ clear data;
 %% cmd_vel_with_limits
 data = finddata(S,'_cmd_vel_with_limits');
 if(~isempty(fieldnames(data)))
-    cmd_vel = timeseries([data.(4) data.(10)],data.(1),'Name','Command Speed (m/s)');
+    cmd_vel = timeseries([data.(4) data.(10)],epoch2mat(data.(1)),'Name','Command Speed (m/s)');
 end
 clear data;
 %% cmd_vel
 data = finddata(S,'_cmd_vel');
 if(~isempty(fieldnames(data)))
-    cmd_vel = timeseries([data.(3) data.(9)],data.(1),'Name','Command Speed (m/s)');
+    cmd_vel = timeseries([data.(3) data.(9)],epoch2mat(data.(1)),'Name','Command Speed (m/s)');
 end
 
 clear data;
 %% cmd_brake
 data = finddata(S,'_pacmod_parsed_tx_brake_rpt');
 if(~isempty(fieldnames(data)))
-    cmd_brake = timeseries(data.(16),'Name','Brake Command (%)');
+    cmd_brake = timeseries(data.(16),epoch2mat(data.(1)),'Name','Brake Command (%)');
 end 
 clear data;
 %% accel_cmd
-data = finddata(S,'_pacmod_as_rx_accel_cmd');
+data = finddata(S,'_pacmod_parsed_tx_accel_rpt');
 if(~isempty(fieldnames(data)))
-    accel_cmd = timeseries(data.(2),data.(1),'Name','Accelerator Command (%)');
+    accel_cmd = timeseries(data.(16),epoch2mat(data.(1)),'Name','Accelerator Command (%)');
 end
 clear data;
 %% req_accel
@@ -130,7 +130,7 @@ clear data;
 %% filtered accel
 data = finddata(S,'_filtered_accel');
 if(~isempty(fieldnames(data)))
-    filtered_accel = timeseries(data.(2),data.(1),'Name','Filtered Acceleration (m/s^2)');
+    filtered_accel = timeseries(data.(2),epoch2mat(data.(1)),'Name','Filtered Acceleration (m/s^2)');
 end
 clear data;
 %% end
