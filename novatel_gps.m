@@ -10,7 +10,7 @@ function [ gps ] = novatel_gps(S)
         data = Data.data;  % 1              % 2          %3          %4            %5         %6           %7            %8         %9              %10                                                 
         time = Data.time;
     
-        gps.time = time;
+        gps.time = epoch2mat(time);
         gps.lat = data(:,1); % 17
         gps.long = data(:,2); %18 
         gps.alt = data(:,3); % 19
@@ -22,7 +22,9 @@ function [ gps ] = novatel_gps(S)
         gps.azimuth = data(:,9); %26
     
         [gps.N, gps.E, utmzone] = deg2utm(gps.lat,gps.long);
-        gps.speed = sqrt(gps.Nspeed.^2+gps.Espeed.^2 + gps.Uspeed.^2);
+        gps.speed = sqrt(gps.Nspeed.^2+gps.Espeed.^2 + 0*gps.Uspeed.^2);
+        
+        %gps_speed = timeseries((gps.speed/0.4407),gps.time,'Name','GPS Speed (MPH)');
     else
         if (~isempty(fieldnames(fix)))
         Data = timeseries([fix.(7) fix.(8) fix.(9)], fix.(1));
