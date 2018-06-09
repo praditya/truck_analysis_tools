@@ -29,7 +29,7 @@ hold off
 %% slope calcs
 try
    X = [ones(length(slope),1) slope(:,1)];
-   slp = X\slope(:,2)
+   slp = X\slope(:,2);
 end
 %% throttle_plot
 try
@@ -120,7 +120,7 @@ rate = [0;1./diff(time)];
 % plot(corrimudata.time,corrimudata.data(:,2).*50)
 Fs = 50;
 % x = sqrt(corrimudata.data(:,1).^2*50+corrimudata.data(:,2).^2*50+corrimudata.data(:,3).^2*50);
-x = corrimudata.data(1:500,1)*50;
+x = corrimudata.data(1:100,1)*50;
 N = length(x);
 xdft = fft(x);
 xdft = xdft(1:N/2+1);
