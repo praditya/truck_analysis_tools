@@ -6,7 +6,7 @@ function fftplot(data_rpt)
 % data_rpt = timeseries data
 
 % Example : 
-% fftplot(accel_rpt);
+% fftplot(corrimudata);
 
 close all;
 %get struct from timeseries object
