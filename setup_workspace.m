@@ -30,12 +30,14 @@ gps = novatel_gps(S);
 % if(isempty(fieldnames(gps)))
 %     clear gps
 % end
+
 % %% navsat Odom
 % data = finddata(S,'_navsat_odom'); % Not sure if needed anymore
 % if(~isempty(fieldnames(data)))
 %     navsat_odom = timeseries([data.(6) data.(7) data.(8) data.(49) data.(50) data.(51)],data.(1),'Name','Navsat Odom');
 % end
 % clear data;
+
 %% imu_data
 % data = finddata(S,'_imu_data');
 data = finddata(S,'_vectornav_imu');
