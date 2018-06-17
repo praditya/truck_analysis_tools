@@ -19,10 +19,10 @@ if(~isempty(fieldnames(data)))
     zed_odom = timeseries([data.(12) data.(13) data.(14)],data.(1),'Name','Zed Odometry');
 end
 clear data;
-%% corrimudata
-data = finddata(S,'_novatel_data_corrimudata'); %Not sure if needed anymore
+%% corrimudata %imu data earlier from novatel was is m/s^2 per sample
+data = finddata(S,'_imu_data'); %Not sure if needed anymore
 if(~isempty(fieldnames(data)))
-    corrimudata = timeseries([data.(19) data.(20) data.(20)],data.(1),'Name','Acceleration');
+    corrimudata = timeseries([data.(20) data.(21) data.(22)],data.(1),'Name','Acceleration');
 end
 clear data;
 %% Novatel INSPVAX
@@ -30,12 +30,14 @@ gps = novatel_gps(S);
 % if(isempty(fieldnames(gps)))
 %     clear gps
 % end
-%% navsat Odom
-data = finddata(S,'_navsat_odom'); % Not sure if needed anymore
-if(~isempty(fieldnames(data)))
-    navsat_odom = timeseries([data.(6) data.(7) data.(8) data.(49) data.(50) data.(51)],data.(1),'Name','Navsat Odom');
-end
-clear data;
+
+% %% navsat Odom
+% data = finddata(S,'_navsat_odom'); % Not sure if needed anymore
+% if(~isempty(fieldnames(data)))
+%     navsat_odom = timeseries([data.(6) data.(7) data.(8) data.(49) data.(50) data.(51)],data.(1),'Name','Navsat Odom');
+% end
+% clear data;
+
 %% imu_data
 % data = finddata(S,'_imu_data');
 data = finddata(S,'_vectornav_imu');
